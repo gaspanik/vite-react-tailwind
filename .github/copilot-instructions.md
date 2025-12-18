@@ -21,6 +21,25 @@ Minimal React 19 + TypeScript + Vite 7 + Tailwind CSS 4 starter with pnpm worksp
 
 ## Coding Conventions
 
+### React
+
+- **Omit React Import**: Project uses `react-jsx` transform — **never** write `import React from 'react'`
+- **Hook Imports**: Import hooks as named imports: `import { useState, useEffect } from 'react'`
+- **Component Structure**:
+  - Use semantic HTML tags (`header`, `main`, `footer`, `section`, `article`, `nav`, `aside`)
+  - Define props explicitly with TypeScript interfaces
+  - Example:
+    ```tsx
+    interface ButtonProps {
+      label: string
+      onClick: () => void
+    }
+
+    function Button({ label, onClick }: ButtonProps) {
+      return <button onClick={onClick}>{label}</button>
+    }
+    ```
+
 ### TypeScript
 
 - **Strict Mode**: `strict: true`, unused variables/parameters error, `noUncheckedSideEffectImports` enabled
@@ -69,6 +88,30 @@ Tasks defined in `mise.toml` can be run with `mise run <task>`:
 - **Customization**: Use CSS variables or `@theme` directives (not traditional JS config)
 - **Vite Plugin**: `@tailwindcss/vite` required (no PostCSS needed)
 
+### Theme Management
+
+- **Use @theme Block**: Define project-specific design tokens in `src/index.css`:
+  ```css
+  @import "tailwindcss";
+
+  @theme {
+    --color-primary: #294779;
+    --color-secondary: #f59e0b;
+  }
+  ```
+- **Reference Custom Classes**: Use theme variables (`text-primary`) instead of arbitrary values (`text-[#294779]`)
+- **Avoid Hardcoded Values**: Centralize colors/spacing in `@theme` for consistency
+
+### Spacing and Value Guidelines
+
+- **Prioritize Standard Scale**: Tailwind's spacing scale (1 unit = 4px) should be used first:
+  - ✅ Good: `gap-2` (8px), `p-4` (16px), `m-6` (24px), `w-80` (320px)
+  - ❌ Avoid: `gap-[8px]`, `p-[16px]`, `w-[320px]`
+- **Arbitrary Values as Last Resort**: Use `[...]` syntax **only** when standard scale or theme variables cannot achieve the design:
+  - Acceptable: `w-[42px]` (if design requires exact 42px)
+  - Better: Add to `@theme` if used multiple times
+- **Responsive Design**: Use standard breakpoints (`sm:`, `md:`, `lg:`, `xl:`, `2xl:`)
+
 ### V4 Class Name Changes (CRITICAL)
 
 Tailwind CSS v4 has updated class naming conventions. **Always use v4 syntax**:
@@ -109,6 +152,44 @@ function Component() {
 
 - **CSS Classes**: Tailwind utilities preferred
 - **Type Safety**: Local CSS like `App.css` can be used alongside (`import './App.css'`)
+
+## Accessibility (a11y)
+
+### Navigation Structure
+
+- **Semantic Menus**: Build navigation using proper list structure:
+  ```tsx
+  <nav aria-label="Main navigation">
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/about">About</a></li>
+    </ul>
+  </nav>
+  ```
+- **ARIA Labels**: Provide descriptive `aria-label` to `<nav>` elements (e.g., `"Main navigation"`, `"Footer links"`)
+
+### Interactive Elements
+
+- **Mobile Menu Buttons**: Use proper ARIA attributes:
+  ```tsx
+  <button
+    aria-expanded={isOpen}
+    aria-controls="mobile-menu"
+    aria-label="Toggle menu"
+  >
+    Menu
+  </button>
+  ```
+- **State Indication**: Set `aria-expanded` to `true`/`false` for collapsible sections
+- **Control Relationships**: Use `aria-controls` to link buttons with their target elements
+- **Focus Management**: Ensure keyboard navigation works for all interactive elements
+
+### Best Practices
+
+- **Alt Text**: Always provide meaningful `alt` attributes for images
+- **Color Contrast**: Ensure text meets WCAG AA standards (4.5:1 for normal text)
+- **Keyboard Navigation**: All functionality must be accessible via keyboard
+- **Screen Reader Testing**: Test with VoiceOver (macOS) or NVDA/JAWS (Windows)
 
 ## Troubleshooting
 
