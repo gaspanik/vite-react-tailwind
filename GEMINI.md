@@ -2,78 +2,104 @@
 
 ## Project Overview
 
-This is a **minimal starter template** for building modern web applications using **React 19**, **TypeScript 5.9**, **Vite 7**, and **Tailwind CSS 4**. It is designed for performance and developer experience, leveraging **Biome** for fast linting and formatting.
+This is a **minimal starter template** for building modern web applications. It leverages the latest technologies for performance and developer experience.
 
-**Key Features:**
-*   **Framework:** React 19 + React DOM 19
-*   **Build Tool:** Vite 7 (with Fast Refresh)
-*   **Styling:** Tailwind CSS 4 (Zero-configuration approach via `@tailwindcss/vite`)
-*   **Language:** TypeScript 5.9 (Strict mode enabled)
+## Tech Stack
+
+*   **Framework:** React 19.2 + React DOM 19.2
+*   **Build Tool:** Vite 7 (Fast Refresh enabled)
+*   **Language:** TypeScript 5.9 (Strict mode, `noExplicitAny`, `react-jsx` transform)
+*   **Styling:** Tailwind CSS 4 (Zero-configuration via `@tailwindcss/vite`)
+*   **Utilities:**
+    *   `clsx` + `tailwind-merge` (combined as `cn` helper)
+    *   `class-variance-authority` (CVA) for component variants
+    *   `lucide-react` for icons
 *   **Tooling:** Biome 2.3 (Linter & Formatter), pnpm (Package Manager)
 
 ## Directory Structure
 
 ```text
-/Users/cipher/Documents/projects/tailwind-vite/
-├── .github/               # GitHub specific configurations (Copilot instructions)
+/Users/cipher/Desktop/cn-button/
+├── .github/
+│   └── copilot-instructions.md   # Detailed AI coding instructions
 ├── src/
-│   ├── App.tsx            # Root React component
-│   ├── main.tsx           # Application entry point
-│   ├── index.css          # Global styles (includes Tailwind directives)
-│   └── vite-env.d.ts      # Vite type definitions
-├── .editorconfig          # Editor configuration (respected by Biome)
-├── biome.json             # Biome configuration (Linting/Formatting rules)
-├── index.html             # HTML entry point
-├── mise.toml              # Task runner configuration (wraps pnpm scripts)
-├── package.json           # Dependencies and scripts
-├── pnpm-workspace.yaml    # pnpm workspace configuration
-├── tsconfig.json          # TypeScript root configuration
-└── vite.config.ts         # Vite configuration
+│   ├── components/               # Reusable UI components
+│   │   ├── ButtonCn.tsx          # Simple button using 'cn'
+│   │   └── ButtonCva.tsx         # Variant-based button using 'cva'
+│   ├── lib/
+│   │   └── utils.ts              # Utilities (contains 'cn' function)
+│   ├── App.tsx                   # Root component
+│   ├── App.css                   # Component-level styles
+│   ├── index.css                 # Global styles (@import "tailwindcss")
+│   ├── main.tsx                  # Entry point
+│   └── vite-env.d.ts             # Vite types
+├── biome.json                    # Biome configuration
+├── index.html                    # HTML entry point
+├── mise.toml                     # Task runner configuration
+├── package.json                  # Dependencies
+├── pnpm-workspace.yaml           # Workspace config
+├── tsconfig.json                 # TS root config
+└── vite.config.ts                # Vite config (defines '@/' alias)
 ```
 
 ## Development Workflow
 
 ### Prerequisites
-*   **Node.js:** >= 20.19 (Recommended for Vite 7)
+*   **Node.js:** >= 20.19
 *   **Package Manager:** pnpm
 
 ### Key Commands
-Run these commands using `pnpm <script>` or `mise run <task>`:
 
 | Command | Action | Description |
 | :--- | :--- | :--- |
-| `dev` | `vite` | Starts the development server with HMR. |
-| `build` | `tsc -b && vite build` | Type-checks and builds the application for production. |
-| `preview` | `vite preview` | Previews the production build locally. |
-| `lint` | `biome lint --write` | Lints the codebase using Biome and fixes issues where possible. |
-| `format` | `biome format --write` | Formats the codebase using Biome. |
-| `check` | `biome check --write` | Runs both formatting and linting checks. |
+| `pnpm dev` | `vite` | Start dev server (HMR enabled). |
+| `pnpm build` | `tsc -b && vite build` | Type-check and build for production. |
+| `pnpm preview` | `vite preview` | Preview production build. |
+| `pnpm check` | `biome check --write` | Format and lint code. |
+
+**Note:** If `mise` is installed, you can use `mise run vite:dev`, `mise run biome:check`, etc.
 
 ## Coding Conventions
 
+### React 19
+*   **Imports:** **NEVER** import React (`import React from 'react'`). Use the `react-jsx` transform.
+*   **Hooks:** Use named imports: `import { useState, useEffect } from 'react'`.
+*   **Structure:** Use semantic HTML (`<nav>`, `<main>`, `<section>`). Define explicit props interfaces.
+
 ### TypeScript
-*   **Strict Mode:** Enabled. Avoid `any` types; explicit typing is enforced.
-*   **Imports:** Uses standard ES modules.
-*   **JSX:** Uses the automatic runtime (`react-jsx`), so `import React` is not required.
+*   **Strict Mode:** Enabled. `noExplicitAny` and `noUnusedVariables` are enforced errors.
+*   **Path Alias:** Use `@/` to import from `src/` (e.g., `import { cn } from '@/lib/utils'`).
 
-### Styling (Tailwind CSS v4)
-*   **Configuration:** Zero-config. Tailwind is configured via `@import "tailwindcss";` in `src/index.css`.
-*   **Usage:** Use utility classes directly in JSX (e.g., `className="flex items-center"`).
-*   **Icons:** `lucide-react` is used for icons.
+### Tailwind CSS v4 (CRITICAL)
+*   **Configuration:** **NO** `tailwind.config.js`. Config is handled in `src/index.css` via `@import "tailwindcss";` and `@theme` blocks.
+*   **Class Names (v4):**
+    *   ❌ `space-x-*` / `space-y-*` -> ✅ Use `gap-*` with flex/grid.
+    *   ❌ `divide-*` -> ✅ Use borders on children.
+*   **Values:**
+    *   Prioritize standard scale (e.g., `p-4`, `gap-2`).
+    *   Use `@theme` variables for colors (e.g., `text-primary`).
+    *   Avoid arbitrary values (`w-[35px]`) unless absolutely necessary.
 
-### Formatting & Linting (Biome)
+### Component Patterns
+
+#### `cn` Utility
+Always use the `cn` function (from `@/lib/utils`) to merge classes and handle conditionals.
+```tsx
+<div className={cn('base-class', isActive && 'active-class', className)} />
+```
+
+#### Button Patterns
+1.  **Simple (`ButtonCn.tsx`):** Use `cn` for simple boolean states (`active`, `disabled`).
+2.  **Variants (`ButtonCva.tsx`):** Use `class-variance-authority` (CVA) for multiple variants (`size`, `intent`).
+
+### Accessibility (a11y)
+*   **Navigation:** Use `<nav>` with `aria-label`.
+*   **Interactive:** Use `aria-expanded`, `aria-controls` for menus/toggles.
+*   **Images:** Always provide `alt` text.
+*   **Contrast:** Ensure WCAG AA compliance.
+
+### Formatting (Biome)
 *   **Indentation:** 2 spaces.
-*   **Quotes:** Single quotes for JS/TS, double quotes for JSX attributes.
+*   **Quotes:** Single quotes (JSX attributes use double quotes).
 *   **Semicolons:** As needed.
-*   **Trailing Commas:** All (ES5+ compatible).
-*   **Rules:**
-    *   `noExplicitAny`: Error.
-    *   `noUnusedVariables`: Error.
-    *   `useHookAtTopLevel`: Error.
-    *   `useExhaustiveDependencies`: Warning.
-
-## Configuration Files
-
-*   **`vite.config.ts`:** Configures the React and Tailwind CSS plugins. Sets the base path to `./`.
-*   **`biome.json`:** strict rules for linting and formatting. Includes overrides for TypeScript files.
-*   **`tsconfig.json`:** Uses project references (`tsconfig.app.json`, `tsconfig.node.json`) and sets strict compiler options suitable for modern web development.
+*   **Trailing Commas:** All.
