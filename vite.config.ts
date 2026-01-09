@@ -6,7 +6,9 @@ import path from 'node:path'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: './',
+  // base path for deploying to a subdirectory
+  // base: './',
+  // path aliases
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
