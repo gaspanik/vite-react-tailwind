@@ -6,7 +6,7 @@ This is a **minimal starter template** for building modern web applications. It 
 
 ## Tech Stack
 
-*   **Framework:** React 19.2 + React DOM 19.2
+*   **Framework:** React 19.2 + React DOM 19.2 (`react-jsx` transform)
 *   **Build Tool:** Vite 7 (Fast Refresh enabled)
 *   **Language:** TypeScript 5.9 (Strict mode, `noExplicitAny`, `react-jsx` transform)
 *   **Styling:** Tailwind CSS 4 (Zero-configuration via `@tailwindcss/vite`)
@@ -19,7 +19,7 @@ This is a **minimal starter template** for building modern web applications. It 
 ## Directory Structure
 
 ```text
-/Users/cipher/Desktop/cn-button/
+.
 ├── .github/
 │   └── copilot-instructions.md   # Detailed AI coding instructions
 ├── src/
@@ -27,7 +27,11 @@ This is a **minimal starter template** for building modern web applications. It 
 │   │   ├── ButtonCn.tsx          # Simple button using 'cn'
 │   │   └── ButtonCva.tsx         # Variant-based button using 'cva'
 │   ├── lib/
+│   │   ├── image.ts              # Eager image loading utilities
+│   │   ├── imageAsync.ts         # Lazy image loading utilities
 │   │   └── utils.ts              # Utilities (contains 'cn' function)
+│   ├── assets/
+│   │   └── images/               # Image assets
 │   ├── App.tsx                   # Root component
 │   ├── App.css                   # Component-level styles
 │   ├── index.css                 # Global styles (@import "tailwindcss")
@@ -71,6 +75,7 @@ This is a **minimal starter template** for building modern web applications. It 
 *   **Path Alias:** Use `@/` to import from `src/` (e.g., `import { cn } from '@/lib/utils'`).
 
 ### Tailwind CSS v4 (CRITICAL)
+*   **MCP Integration:** When Tailwind CSS MCP tools are available, **ALWAYS** use them to verify class names, search documentation, and ensure adherence to the latest v4 specifications.
 *   **Configuration:** **NO** `tailwind.config.js`. Config is handled in `src/index.css` via `@import "tailwindcss";` and `@theme` blocks.
 *   **Class Names (v4):**
     *   ❌ `space-x-*` / `space-y-*` -> ✅ Use `gap-*` with flex/grid.
@@ -79,6 +84,14 @@ This is a **minimal starter template** for building modern web applications. It 
     *   Prioritize standard scale (e.g., `p-4`, `gap-2`).
     *   Use `@theme` variables for colors (e.g., `text-primary`).
     *   Avoid arbitrary values (`w-[35px]`) unless absolutely necessary.
+*   **Theme Management:**
+    Define project-specific design tokens in `src/index.css`:
+    ```css
+    @import "tailwindcss";
+    @theme {
+      --color-primary: #294779;
+    }
+    ```
 
 ### Component Patterns
 
@@ -92,10 +105,29 @@ Always use the `cn` function (from `@/lib/utils`) to merge classes and handle co
 1.  **Simple (`ButtonCn.tsx`):** Use `cn` for simple boolean states (`active`, `disabled`).
 2.  **Variants (`ButtonCva.tsx`):** Use `class-variance-authority` (CVA) for multiple variants (`size`, `intent`).
 
+### Asset Management
+
+#### Image Utilities
+Images are managed via `import.meta.glob` in `src/lib/`. Place images in `src/assets/images/`.
+
+*   **Eager Loading:** Use `getImage` from `@/lib/image` for static assets (returns string).
+    ```tsx
+    import { getImage } from '@/lib/image'
+    <img src={getImage('hero.jpg')} alt="Hero" />
+    ```
+*   **Lazy Loading:** Use `getImageAsync` from `@/lib/imageAsync` for large images (returns Promise).
+    ```tsx
+    import { getImageAsync } from '@/lib/imageAsync'
+    // in useEffect...
+    getImageAsync('big-pic.png').then(setUrl)
+    ```
+
 ### Accessibility (a11y)
-*   **Navigation:** Use `<nav>` with `aria-label`.
-*   **Interactive:** Use `aria-expanded`, `aria-controls` for menus/toggles.
-*   **Images:** Always provide `alt` text.
+*   **Navigation:** Use `<nav>` with descriptive `aria-label`.
+*   **Interactive:**
+    *   Use `aria-expanded` and `aria-controls` for menus/toggles.
+    *   Ensure keyboard navigability.
+*   **Images:** Always provide meaningful `alt` text.
 *   **Contrast:** Ensure WCAG AA compliance.
 
 ### Formatting (Biome)

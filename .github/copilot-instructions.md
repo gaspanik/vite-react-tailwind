@@ -16,6 +16,9 @@ Minimal React 19 + TypeScript + Vite 7 + Tailwind CSS 4 starter with pnpm worksp
 
 - **Entry**: `index.html` → `src/main.tsx` → `src/App.tsx`
 - **Styles**: `src/index.css` with `@import "tailwindcss"` only (no config file, v4 approach)
+- **Components**: `src/components/` for reusable UI components
+- **Utilities**: `src/lib/utils.ts` with `cn` function (clsx + tailwind-merge)
+- **Path Alias**: `@/` maps to `src/` for cleaner imports (configured in both `vite.config.ts` and `tsconfig.app.json`)
 - **TypeScript**: Project references (`tsconfig.json` references `tsconfig.app.json` and `tsconfig.node.json`)
 - **Vite Config**: `vite.config.ts` with `base: './'` (relative path deployment)
 
@@ -46,6 +49,12 @@ Minimal React 19 + TypeScript + Vite 7 + Tailwind CSS 4 starter with pnpm worksp
 - **Module**: `moduleResolution: "bundler"`, `allowImportingTsExtensions: true`
 - **JSX**: `react-jsx` transform (no `import React` needed)
 - **Type Checking**: `erasableSyntaxOnly: true` (limited to type-only syntax)
+- **Path Mapping**: `baseUrl: "./src"` with `@/*` alias for absolute imports from `src/`
+  ```tsx
+  // Use @/ to import from src/
+  import { Button } from '@/components/ButtonCn'
+  import { cn } from '@/lib/utils'
+  ```
 
 ### Biome Rules
 
@@ -70,12 +79,17 @@ pnpm preview
 pnpm check
 ```
 
+**AI-Assisted Development**: When Tailwind CSS MCP server is available, leverage it to ensure accurate utility class usage and stay updated with v4 specifications.
+
 ### Mise Tasks (Recommended)
 
 Tasks defined in `mise.toml` can be run with `mise run <task>`:
 
-- `vite:dev` / `vite:build` / `vite:preview`
-- `biome:format` / `biome:lint` / `biome:check` (with confirmation prompts)
+- **Vite tasks**: `vite:dev`, `vite:build`, `vite:preview`
+- **Biome tasks**: `biome:format`, `biome:lint`, `biome:check`
+- All Biome and build tasks include confirmation prompts
+
+Use mise commands in environments with mise installed, otherwise use pnpm directly.
 
 ## Dependency Management
 
@@ -84,9 +98,24 @@ Tasks defined in `mise.toml` can be run with `mise run <task>`:
 
 ## Tailwind CSS v4 Notes
 
-- **No Config Needed**: No `tailwind.config.js`, just `@import "tailwindcss"` in `src/index.css`
-- **Customization**: Use CSS variables or `@theme` directives (not traditional JS config)
-- **Vite Plugin**: `@tailwindcss/vite` required (no PostCSS needed)
+- **No Config Needed**: No `tailwind.config.js` required — just use `@import "tailwindcss"` in your main CSS file
+- **Installation**: Use `@tailwindcss/vite` plugin (no PostCSS setup required for Vite projects)
+  ```ts
+  // vite.config.ts
+  import tailwindcss from '@tailwindcss/vite'
+  
+  export default defineConfig({
+    plugins: [tailwindcss()],
+  })
+  ```
+- **Customization**: Use CSS variables and `@theme` directives directly in CSS (not JavaScript config)
+- **Import**: Add `@import "tailwindcss";` to your main CSS file (e.g., `src/index.css`)
+- **MCP Server Integration**: When Tailwind CSS MCP server is available, actively use it to:
+  - Search utilities by category or property (`mcp_tailwindcss_m_get_tailwind_utilities`)
+  - Verify v4 syntax and class names (`mcp_tailwindcss_m_search_tailwind_docs`)
+  - Convert legacy CSS to Tailwind utilities (`mcp_tailwindcss_m_convert_css_to_tailwind`)
+  - Generate component templates with proper Tailwind classes (`mcp_tailwindcss_m_generate_component_template`)
+  - Get color palette information (`mcp_tailwindcss_m_get_tailwind_colors`)
 
 ### Theme Management
 
@@ -104,13 +133,15 @@ Tasks defined in `mise.toml` can be run with `mise run <task>`:
 
 ### Spacing and Value Guidelines
 
-- **Prioritize Standard Scale**: Tailwind's spacing scale (1 unit = 4px) should be used first:
-  - ✅ Good: `gap-2` (8px), `p-4` (16px), `m-6` (24px), `w-80` (320px)
-  - ❌ Avoid: `gap-[8px]`, `p-[16px]`, `w-[320px]`
+- **Prioritize Standard Scale**: Tailwind's spacing scale (base unit = 0.25rem/4px) should be used first:
+  - ✅ Good: `gap-2` (0.5rem), `p-4` (1rem), `m-8` (2rem), `w-80` (20rem)
+  - ❌ Avoid: `gap-[0.5rem]`, `p-[1rem]`, `w-[20rem]`
+  - **Standard values**: `m-0` (0), `m-1` (0.25rem), `m-2` (0.5rem), `m-4` (1rem), `m-8` (2rem)
 - **Arbitrary Values as Last Resort**: Use `[...]` syntax **only** when standard scale or theme variables cannot achieve the design:
-  - Acceptable: `w-[42px]` (if design requires exact 42px)
+  - Acceptable: `w-[42px]` (if design requires exact 42px outside the scale)
   - Better: Add to `@theme` if used multiple times
 - **Responsive Design**: Use standard breakpoints (`sm:`, `md:`, `lg:`, `xl:`, `2xl:`)
+- **Modifiers**: Combine with state variants (`hover:`, `focus:`, `active:`, `disabled:`) and dark mode (`dark:`)
 
 ### V4 Class Name Changes (CRITICAL)
 
@@ -134,7 +165,92 @@ Tailwind CSS v4 has updated class naming conventions. **Always use v4 syntax**:
 
 **Never generate or suggest v3-specific utilities.** When refactoring, convert deprecated utilities to modern flex/grid patterns.
 
+**When MCP server is available**: Always verify class names and syntax against the latest Tailwind CSS v4 documentation using MCP tools before suggesting code.
+
 ## Component Patterns
+
+### cn Function
+
+The `cn` utility (in `src/lib/utils.ts`) combines `clsx` and `tailwind-merge` to handle conditional class names and resolve Tailwind conflicts:
+
+```tsx
+import { cn } from '@/lib/utils'
+
+// Basic usage with conditional classes
+<button
+  className={cn(
+    'base-styles',
+    isActive && 'active-styles',
+    disabled && 'disabled-styles',
+    className  // Allow external override
+  )}
+>
+```
+
+### Button Component Patterns
+
+Two main approaches for building components with variant styles:
+
+**1. Simple Conditional Approach (`ButtonCn.tsx`)**:
+- Use `cn` function for conditional styling
+- Best for simple components with few variations or single DOM elements
+- Example:
+  ```tsx
+  import { cn } from '@/lib/utils'
+  import type { ComponentProps } from 'react'
+
+  type ButtonProps = ComponentProps<'button'> & {
+    active?: boolean
+  }
+
+  export const Button = ({ className, active, disabled, ...props }: ButtonProps) => (
+    <button
+      className={cn(
+        'base-classes',
+        active && 'active-classes',
+        disabled && 'disabled-classes',
+        className
+      )}
+      {...props}
+    />
+  )
+  ```
+
+**2. Variant API Approach (`ButtonCva.tsx`)**:
+- Use `class-variance-authority` (CVA) for complex variants
+- Best for single-element components with multiple design system variants
+- Type-safe variant props with `VariantProps<typeof variants>`
+- Example:
+  ```tsx
+  import { cva, type VariantProps } from 'class-variance-authority'
+  import { cn } from '@/lib/utils'
+
+  const buttonVariants = cva('base-classes', {
+    variants: {
+      intent: {
+        primary: 'primary-classes',
+        secondary: 'secondary-classes'
+      },
+      size: {
+        sm: 'small-classes',
+        md: 'medium-classes'
+      }
+    },
+    defaultVariants: { intent: 'primary', size: 'md' }
+  })
+
+  type ButtonProps = ComponentProps<'button'> & VariantProps<typeof buttonVariants>
+
+  export const ButtonCva = ({ intent, size, className, ...props }: ButtonProps) => (
+    <button className={cn(buttonVariants({ intent, size }), className)} {...props} />
+  )
+  ```
+
+**When to use each approach:**
+- **cn function**: Simple components, few conditionals, single element
+- **CVA**: Single-element components with multiple variant combinations (buttons, badges, forms)
+
+### Icons
 
 ```tsx
 // lucide-react icon usage example (see src/App.tsx)
@@ -150,8 +266,125 @@ function Component() {
 }
 ```
 
+### Styling Guidelines
+
 - **CSS Classes**: Tailwind utilities preferred
 - **Type Safety**: Local CSS like `App.css` can be used alongside (`import './App.css'`)
+- **Inline classes**: Keep component styles in `className` props
+- **`cn()` for composition**: Merge and dedupe Tailwind classes (uses `clsx` + `tailwind-merge`)
+- **Icons**: Use `lucide-react` with consistent sizing (`w-4 h-4` for inline, `w-6 h-6` for headings)
+- **Component Overrides**: Accept `className` prop and apply it last in `cn` call
+
+## Asset Management
+
+### Image Utilities
+
+This project uses Vite's `import.meta.glob` for optimized image handling. All images should be placed in `src/assets/images/`.
+
+**Files**:
+- `src/lib/image.ts` - Eager loading (sync functions)
+- `src/lib/imageAsync.ts` - Lazy loading (async functions)
+
+**Supported formats**: `jpg`, `jpeg`, `png`, `webp`, `svg`
+
+#### getImage()
+
+Get images with or without file extension. Automatically resolves extension if omitted.
+
+```tsx
+import { getImage } from '@/lib/image'
+
+function Component() {
+  return (
+    <img 
+      src={getImage('portrait.jpg')}  // With extension
+      alt="Portrait" 
+    />
+    // or
+    <img 
+      src={getImage('portrait')}      // Auto-detects portrait.jpg
+      alt="Portrait" 
+    />
+  )
+}
+```
+
+- Returns empty string if image not found
+- Dev mode: Logs console warning for missing images
+- Eager loading (all images loaded at build time)
+
+#### getImageAsync()
+
+Lazy-load large images for better performance:
+
+```tsx
+import { getImageAsync } from '@/lib/imageAsync'
+import { useState, useEffect } from 'react'
+
+function Gallery() {
+  const [imageUrl, setImageUrl] = useState('')
+  
+  useEffect(() => {
+    getImageAsync('large-photo.jpg').then(setImageUrl)
+  }, [])
+  
+  return imageUrl ? <img src={imageUrl} alt="Large" /> : <p>Loading...</p>
+}
+```
+
+#### getAllImages()
+
+Get all images as a key-value map (useful for galleries):
+
+```tsx
+import { getAllImages } from '@/lib/image'
+
+function ImageGallery() {
+  const images = getAllImages() // { filename: url, ... }
+  
+  return (
+    <div className="grid grid-cols-3 gap-4">
+      {Object.entries(images).map(([name, url]) => (
+        <img key={name} src={url} alt={name} />
+      ))}
+    </div>
+  )
+}
+```
+
+#### getAllImagesAsync()
+
+Asynchronously get all images as a key-value map:
+
+```tsx
+import { getAllImagesAsync } from '@/lib/imageAsync'
+import { useState, useEffect } from 'react'
+
+function ImageGallery() {
+  const [images, setImages] = useState<Record<string, string>>({})
+  
+  useEffect(() => {
+    getAllImagesAsync().then(setImages)
+  }, [])
+  
+  return (
+    <div className="grid grid-cols-3 gap-4">
+      {Object.entries(images).map(([name, url]) => (
+        <img key={name} src={url} alt={name} />
+      ))}
+    </div>
+  )
+}
+```
+
+**Best Practices:**
+- Place all images in `src/assets/images/`
+- Use descriptive filenames (e.g., `hero-banner.jpg`, not `img1.jpg`)
+- Prefer `getImage()` for static assets (eager loading, faster initial load)
+- Use `getImageAsync()` for large images or conditional loading (lazy loading)
+- Import async functions from `@/lib/imageAsync`
+- Import sync functions from `@/lib/image`
+- Always provide meaningful `alt` text for accessibility
 
 ## Accessibility (a11y)
 
