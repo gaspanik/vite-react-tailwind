@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.4.2/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.4/schema.json",
   "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
   "files": { "ignoreUnknown": true },
   "formatter": {
@@ -327,6 +327,8 @@
   ],
   "assist": {
     "enabled": true,
-    "actions": { "source": { "organizeImports": "off", "noDuplicateClasses": "on" } }
+    "actions": {
+      "source": { "organizeImports": "off", "noDuplicateClasses": "on" }
+    }
   }
 }
