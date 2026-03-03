@@ -160,6 +160,39 @@ const className = cn(
 - **厳格な TypeScript ルール**：`noExplicitAny`、`noUnusedVariables` をエラー扱い
 - **React 専用ルール**：`useExhaustiveDependencies`、`useHookAtTopLevel`
 
+## Claude Code カスタムコマンド
+
+`.claude/commands/` に定義されたスラッシュコマンドを利用できます。
+
+### Figma ワークフロー
+
+Figma MCP サーバーが接続されている場合に使用できます。
+
+| コマンド | 説明 |
+|---|---|
+| `/figma:setup-env` | `src/App.tsx` と `src/App.css` のデモコンテンツをクリアして空ページにする（実装開始前に1回だけ実行） |
+| `/figma:implement-figma <URL>` | Figma URL のデザインを実装する |
+| `/figma:review-figma <URL>` | Figma スクリーンショットと実装を比較してレビュー・修正する |
+| `/figma:code-optim` | `src/components/` 内のコンポーネントをリファクタリングして再利用性・保守性を向上させる |
+
+#### 標準的な使い方
+
+```
+# 1. デモコンテンツをクリア（初回のみ）
+/figma:setup-env
+
+# 2. デザインを実装
+/figma:implement-figma https://www.figma.com/design/xxx...
+
+# 3. Figma と比較してレビュー・修正
+/figma:review-figma https://www.figma.com/design/xxx...
+
+# 4. コンポーネントをリファクタリング
+/figma:code-optim
+```
+
+> **Note**: Figma URL の `node-id` パラメータは `1-2` 形式で渡します（`-` を `:` に変換する必要はありません）。
+
 ## 詳細情報
 
 - [Vite ドキュメント](https://vite.dev/)
