@@ -8,13 +8,13 @@ This is a **minimal starter template** for building modern web applications. It 
 
 *   **Framework:** React 19.2 + React DOM 19.2 (`react-jsx` transform)
 *   **Build Tool:** Vite 7 (Fast Refresh enabled)
-*   **Language:** TypeScript 5.9 (Strict mode, `noExplicitAny`, `react-jsx` transform)
+*   **Language:** TypeScript 6.0 (Strict mode, `noExplicitAny`, `react-jsx` transform)
 *   **Styling:** Tailwind CSS 4 (Zero-configuration via `@tailwindcss/vite`)
 *   **Utilities:**
     *   `clsx` + `tailwind-merge` (combined as `cn` helper)
     *   `class-variance-authority` (CVA) for component variants
     *   `lucide-react` for icons
-*   **Tooling:** Biome 2.3 (Linter & Formatter), pnpm (Package Manager)
+*   **Tooling:** Biome 2.4 (Linter & Formatter), pnpm (Package Manager)
 
 ## Directory Structure
 

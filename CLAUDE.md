@@ -9,7 +9,7 @@ Minimal React 19 + TypeScript + Vite 7 + Tailwind CSS 4 starter with pnpm worksp
 - **Framework**: React 19.2 (`react-jsx` transform)
 - **Build**: Vite 7 + `@vitejs/plugin-react` (Fast Refresh enabled)
 - **Styling**: Tailwind CSS 4 (via `@tailwindcss/vite`, applied with `@import "tailwindcss"`)
-- **Linter/Formatter**: Biome 2.3 (strict configuration in `.biome.json`)
+- **Linter/Formatter**: Biome 2.4 (strict configuration in `.biome.json`)
 - **Package Manager**: pnpm (`pnpm-workspace.yaml` with `@tailwindcss/oxide`, `esbuild` as build dependencies only)
 
 ## Key Structure
@@ -53,7 +53,7 @@ function Button({ label, onClick }: ButtonProps) {
 - **Module**: `moduleResolution: "bundler"`, `allowImportingTsExtensions: true`
 - **JSX**: `react-jsx` transform (no `import React` needed)
 - **Type Checking**: `erasableSyntaxOnly: true` (limited to type-only syntax)
-- **Path Mapping**: `baseUrl: "./src"` with `@/*` alias for absolute imports from `src/`
+- **Path Mapping**: `paths` with `@/*` → `./src/*` alias for absolute imports from `src/` (no `baseUrl` needed with `moduleResolution: "bundler"`)
 
 ```tsx
 // Use @/ to import from src/
