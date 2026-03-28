@@ -7,7 +7,7 @@ This is a **minimal starter template** for building modern web applications. It 
 ## Tech Stack
 
 *   **Framework:** React 19.2 + React DOM 19.2 (`react-jsx` transform)
-*   **Build Tool:** Vite 7 (Fast Refresh enabled)
+*   **Build Tool:** Vite 8 (Fast Refresh enabled)
 *   **Language:** TypeScript 6.0 (Strict mode, `noExplicitAny`, `react-jsx` transform)
 *   **Styling:** Tailwind CSS 4 (Zero-configuration via `@tailwindcss/vite`)
 *   **Utilities:**

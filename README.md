@@ -1,12 +1,12 @@
 # Vite Starter for React + TypeScript + Tailwind CSS
 
-React 19 + TypeScript + Vite 7 + Tailwind CSS 4 の最小構成スターターテンプレート。
+React 19 + TypeScript + Vite 8 + Tailwind CSS 4 の最小構成スターターテンプレート。
 
 ## 技術スタック
 
 - **React 19.2** / **React DOM 19.2**
 - **TypeScript 6.0**（strict モード、`react-jsx` transform）
-- **Vite 7** + `@vitejs/plugin-react`（Fast Refresh 有効）
+- **Vite 8** + `@vitejs/plugin-react`（Fast Refresh 有効）
 - **Tailwind CSS 4**（`@tailwindcss/vite` 経由、設定ファイル不要）
 - **Biome 2.4**（厳格ルールでのフォーマッター + Linter）
 - **lucide-react**（アイコンライブラリ）
