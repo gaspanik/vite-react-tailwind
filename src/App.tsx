@@ -1,4 +1,3 @@
-import './App.css'
 import { CheckSquare2, SquareCode, Square } from 'lucide-react'
 import { Button } from '@/components/ButtonCn'
 import { ButtonCva } from '@/components/ButtonCva'
